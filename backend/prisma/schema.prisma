@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+// enum DocumentType {
+//   TRAINEES_DATA_FORM
+//   TRAINER_DATA_FORM
+//   ATTENDANCE_FORM
+//   GENERAL_REPORT_FORM
+//   COURSE_CERTIFICATE
+// }
+
+model User {
+  id                Int       @id @default(autoincrement())
+  password          String
+  changePasswordKey String?   @default("key8829")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Course {
+  id                     Int          @id @default(autoincrement())
+  courseNumber           String       @unique
+  courseCode             String
+  courseFieldId          Int
+  courseField            CourseField  @relation(fields: [courseFieldId], references: [id], onDelete: Cascade)
+  courseName             String
+  numberOfBeneficiaries  Int
+  numberOfGraduates      Int
+  courseDuration         Int
+  courseHours            Int
+  courseVenue            String
+  courseStartDate        DateTime
+  courseEndDate          DateTime
+  trainerName            String
+  trainerPhoneNumber     String
+  notes                  String?
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  // Relations
+  images     CourseImage[]
+  documents  CourseDocument[]
+
+  @@index([courseStartDate])
+  @@index([courseEndDate])
+  @@index([courseFieldId])
+  @@index([trainerName])
+}
+
+model CourseImage {
+  id          Int      @id @default(autoincrement())
+  courseId    Int
+  url         String
+  altText     String?
+  createdAt   DateTime @default(now())
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@unique([courseId, url])
+}
+
+model CourseDocument {
+  id             Int          @id @default(autoincrement())
+  courseId       Int
+  type           String       // changed from enum to String
+  path           String
+  fileName       String?
+  createdAt      DateTime     @default(now())
+  course         Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId, type])
+  @@unique([courseId, type, path])
+}
+
+model CourseField {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  courses     Course[]
+
+  @@index([name])
+}
