@@ -28,9 +28,14 @@ router.get("/", authMiddleware, async (req, res) => {
 
     if (search) {
       where.OR = [
-        { courseNumber: { contains: search, mode: "insensitive" } },
-        { courseName: { contains: search, mode: "insensitive" } },
-        { trainerName: { contains: search, mode: "insensitive" } },
+        { courseNumber: { contains: search } },
+        { courseCode: { contains: search } },
+        { courseName: { contains: search } },
+        { courseVenue: { contains: search } },
+        { trainerName: { contains: search } },
+        { trainerPhoneNumber: { contains: search } },
+        { notes: { contains: search } },
+        { courseField: { name: { contains: search } } },
       ];
     }
 

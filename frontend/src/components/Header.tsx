@@ -1,9 +1,10 @@
-import { GraduationCap, LogOut, Settings } from "lucide-react";
+import { GraduationCap, LogOut, Settings, BarChart2, Home, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { logout } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import { Input } from "./ui/input";
 import AuthContext from "@/context/AuthContext";
 
 
@@ -11,6 +12,14 @@ export const Header = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { logout } = useContext(AuthContext);
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchValue.trim();
+    navigate(q ? `/?search=${encodeURIComponent(q)}` : "/");
+  };
+
   const handleLogout = () => {
     logout();
     toast({
@@ -53,7 +62,26 @@ export const Header = () => {
             <p className="text-sm text-muted-foreground">نظام أرشفة و إدارة الدورات التدريبية</p>
           </div>
           </div>
+
+          <form onSubmit={handleSearch} className="hidden flex-1 sm:flex sm:max-w-sm sm:mx-4">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="بحث في جميع الدورات..."
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </form>
+
           <div className="flex gap-2">
+               <Button variant="outline" size="icon" onClick={() => navigate("/")} title="الرئيسي">
+              <Home className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" onClick={() => navigate("/analytics")} title="التحليلات">
+              <BarChart2 className="h-4 w-4" />
+            </Button>
             <Button variant="outline" size="icon" onClick={() => navigate("/settings")} title="الإعدادات">
               <Settings className="h-4 w-4" />
             </Button>

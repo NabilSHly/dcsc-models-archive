@@ -15,7 +15,6 @@ router.get("/", authMiddleware, async (req, res) => {
       ? {
           name: {
             contains: search,
-            mode: "insensitive",
           },
         }
       : {};

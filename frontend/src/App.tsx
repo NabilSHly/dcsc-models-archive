@@ -8,6 +8,7 @@ import CourseDetails from "./pages/CourseDetails";
 import AddEditCourse from "./pages/AddEditCourse";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Analytics from "./pages/Analytics";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from './context/AuthContext';
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/add-course" element={<ProtectedRoute><AddEditCourse /></ProtectedRoute>} />
           <Route path="/edit-course/:id" element={<ProtectedRoute><AddEditCourse /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

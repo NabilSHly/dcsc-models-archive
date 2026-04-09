@@ -4,13 +4,16 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card } from "./ui/card";
 import { CourseTable } from "./CourseTable";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { listCourses } from "@/services/courses";
 import { getDashboardStats } from "@/services/stats";
 import { toast } from "@/components/ui/sonner";
 
 export const Dashboard = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlSearch = searchParams.get("search") || "";
+  const [searchQuery, setSearchQuery] = useState(urlSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(urlSearch);
   const [courses, setCourses] = useState([]);
   const [stats, setStats] = useState({
     totalCourses: 0,
@@ -22,6 +25,13 @@ export const Dashboard = () => {
   const [totalPages, setTotalPages] = useState(1);
   
   const navigate = useNavigate();
+
+  // Sync URL → local input when Header search navigates here
+  useEffect(() => {
+    setSearchQuery(urlSearch);
+    setDebouncedSearch(urlSearch);
+    setPage(1);
+  }, [urlSearch]);
 
   // Fetch dashboard stats
   useEffect(() => {
@@ -35,7 +45,7 @@ export const Dashboard = () => {
     })();
   }, []);
 
-  // Fetch courses
+  // Fetch courses using debounced value
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -43,7 +53,7 @@ export const Dashboard = () => {
         const response = await listCourses({
           page,
           limit: 10,
-          search: searchQuery,
+          search: debouncedSearch,
         });
         setCourses(response.data);
         setTotalPages(response.pagination.totalPages);
@@ -53,15 +63,23 @@ export const Dashboard = () => {
         setLoading(false);
       }
     })();
-  }, [page, searchQuery]);
+  }, [page, debouncedSearch]);
 
-  // Debounce search
+  // Debounce local input → debouncedSearch + URL
   useEffect(() => {
     const timer = setTimeout(() => {
-      setPage(1); // Reset to first page on new search
+      setDebouncedSearch(searchQuery);
+      setPage(1);
+      const params = new URLSearchParams(searchParams);
+      if (searchQuery) {
+        params.set("search", searchQuery);
+      } else {
+        params.delete("search");
+      }
+      setSearchParams(params, { replace: true });
     }, 500);
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -116,7 +134,7 @@ export const Dashboard = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="البحث باسم الدورة التدريبية أو الرقم أو المدرب..."
+              placeholder="بحث في جميع بيانات الدورات..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
