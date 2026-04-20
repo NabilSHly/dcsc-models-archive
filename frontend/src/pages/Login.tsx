@@ -108,7 +108,7 @@ export default function Login() {
 
           <div className="space-y-3 text-center">
             <CardTitle className="text-balance text-2xl font-bold leading-tight sm:text-3xl">
-              نظام أرشفة النماذج التدريبية
+               نظام أرشفة الدورات التدريبية
             </CardTitle>
             <p className="text-base font-medium text-primary sm:text-lg">
               مركز تطوير البلديات و دعم اللامركزية
